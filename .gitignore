@@ -1,0 +1,8 @@
+.env
+*.db
+crm_tokens.json
+__pycache__/
+*.pyc
+.DS_Store
+bot_out.txt
+bot_err.txt
