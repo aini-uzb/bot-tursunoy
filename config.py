@@ -54,9 +54,9 @@ CHANNEL_SUBSCRIPTION: dict = {
         "📅 Kirish: 30 kun\n\n"
         "To'lash uchun tugmani bosing 👇"
     ),
-    "price": 200000,
-    "price_display_ru": "200,000 сум/мес",
-    "price_display_uz": "200,000 so'm/oy",
+    "price": 3000,
+    "price_display_ru": "3,000 сум/мес",
+    "price_display_uz": "3,000 so'm/oy",
     "days": 30,
     "channel_id": os.getenv("CHANNEL_SUBSCRIPTION_ID", ""),
 }

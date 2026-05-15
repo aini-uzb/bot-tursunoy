@@ -50,8 +50,10 @@ async def handle_prepare(data: dict) -> dict:
     sign_string = data.get("sign_string", "")
 
     expected = _sign(click_trans_id, merchant_trans_id, amount, 0, sign_time)
+    logger.info(f"[Click] prepare sign: expected={expected} got={sign_string} match={expected==sign_string}")
+    logger.info(f"[Click] prepare raw: trans={click_trans_id} svc={CLICK_SERVICE_ID} mtrans={merchant_trans_id} amount={amount} time={sign_time}")
     if expected != sign_string:
-        logger.warning(f"[Click] prepare sign mismatch: expected={expected} got={sign_string}")
+        logger.warning(f"[Click] prepare sign MISMATCH")
         return {"error": -1, "error_note": "SIGN CHECK FAILED!"}
 
     user_id, product_key = _parse_trans_id(merchant_trans_id)
