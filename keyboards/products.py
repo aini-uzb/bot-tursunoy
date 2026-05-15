@@ -62,6 +62,15 @@ def get_click_payment_keyboard(pay_url: str, back_callback: str, lang: str = "ru
     ])
 
 
+def get_payme_payment_keyboard(pay_url: str, back_callback: str, lang: str = "ru") -> InlineKeyboardMarkup:
+    pay_text = "💳 Оплатить через Payme" if lang == "ru" else "💳 Payme orqali to'lash"
+    back_text = "◀️ Назад" if lang == "ru" else "◀️ Orqaga"
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=pay_text, url=pay_url)],
+        [InlineKeyboardButton(text=back_text, callback_data=back_callback)],
+    ])
+
+
 def get_consult_keyboard(btn_text: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=btn_text, callback_data="consult_request")]

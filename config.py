@@ -12,6 +12,11 @@ CLICK_MERCHANT_ID: str = os.getenv("CLICK_MERCHANT_ID", "")
 CLICK_SECRET_KEY: str = os.getenv("CLICK_SECRET_KEY", "")
 CLICK_MERCHANT_USER_ID: str = os.getenv("CLICK_MERCHANT_USER_ID", "")
 
+# Payme
+PAYME_MERCHANT_ID: str = os.getenv("PAYME_MERCHANT_ID", "")
+PAYME_KEY: str = os.getenv("PAYME_KEY", "")
+PAYME_URL: str = os.getenv("PAYME_URL", "https://checkout.paycom.uz")
+
 ADMIN_IDS: list[int] = [
     int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()
 ]

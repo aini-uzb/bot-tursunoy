@@ -51,6 +51,30 @@ async def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS payme_orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                product_key TEXT NOT NULL,
+                amount INTEGER NOT NULL,
+                paid INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS payme_transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                transaction_id TEXT UNIQUE NOT NULL,
+                order_id INTEGER NOT NULL,
+                amount INTEGER NOT NULL,
+                state INTEGER NOT NULL DEFAULT 1,
+                reason INTEGER,
+                create_time INTEGER,
+                perform_time INTEGER DEFAULT 0,
+                cancel_time INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         await db.commit()
 
 
@@ -204,3 +228,79 @@ async def delete_subscription(sub_id: int):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("DELETE FROM subscriptions WHERE id = ?", (sub_id,))
         await db.commit()
+
+
+# ─── Payme ───────────────────────────────────────────────────────────────────
+
+async def create_payme_order(user_id: int, product_key: str, amount: int) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            "INSERT INTO payme_orders (user_id, product_key, amount) VALUES (?, ?, ?)",
+            (user_id, product_key, amount),
+        )
+        await db.commit()
+        return cursor.lastrowid
+
+
+async def get_payme_order(order_id: int) -> dict | None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute("SELECT * FROM payme_orders WHERE id = ?", (order_id,)) as cur:
+            row = await cur.fetchone()
+            return dict(row) if row else None
+
+
+async def mark_payme_order_paid(order_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("UPDATE payme_orders SET paid = 1 WHERE id = ?", (order_id,))
+        await db.commit()
+
+
+async def save_payme_transaction(transaction_id: str, order_id: int, amount: int, create_time: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            """INSERT OR IGNORE INTO payme_transactions
+               (transaction_id, order_id, amount, state, create_time)
+               VALUES (?, ?, ?, 1, ?)""",
+            (transaction_id, order_id, amount, create_time),
+        )
+        await db.commit()
+
+
+async def get_payme_transaction(transaction_id: str) -> dict | None:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM payme_transactions WHERE transaction_id = ?", (transaction_id,)
+        ) as cur:
+            row = await cur.fetchone()
+            return dict(row) if row else None
+
+
+async def complete_payme_transaction(transaction_id: str, perform_time: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE payme_transactions SET state = 2, perform_time = ? WHERE transaction_id = ?",
+            (perform_time, transaction_id),
+        )
+        await db.commit()
+
+
+async def cancel_payme_transaction(transaction_id: str, state: int, reason: int, cancel_time: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE payme_transactions SET state = ?, reason = ?, cancel_time = ? WHERE transaction_id = ?",
+            (state, reason, cancel_time, transaction_id),
+        )
+        await db.commit()
+
+
+async def get_payme_transactions_range(from_ms: int, to_ms: int) -> list[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM payme_transactions WHERE create_time >= ? AND create_time <= ?",
+            (from_ms, to_ms),
+        ) as cur:
+            rows = await cur.fetchall()
+            return [dict(r) for r in rows]

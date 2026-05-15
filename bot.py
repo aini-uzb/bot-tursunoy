@@ -59,6 +59,11 @@ async def click_complete_handler(request: web.Request) -> web.Response:
         return web.json_response({"click_trans_id": 0, "merchant_trans_id": "error", "merchant_confirm_id": 1, "error": 0, "error_note": "Success"})
 
 
+async def payme_webhook_handler(request: web.Request) -> web.Response:
+    from services.payme import payme_handler
+    return await payme_handler(request)
+
+
 async def health_handler(_: web.Request) -> web.Response:
     return web.Response(text="OK")
 
@@ -74,6 +79,7 @@ def build_web_app() -> web.Application:
     # GET нужен чтобы Click мог проверить URL при сохранении в кабинете
     app.router.add_get("/click/prepare", click_health_handler)
     app.router.add_get("/click/complete", click_health_handler)
+    app.router.add_post("/payme", payme_webhook_handler)
     app.router.add_get("/health", health_handler)
     return app
 

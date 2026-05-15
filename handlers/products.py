@@ -8,12 +8,13 @@ from config import COURSES, CHANNEL_SUBSCRIPTION
 from db import update_user, get_user
 from keyboards.products import (
     get_category_keyboard, get_courses_keyboard, get_course_detail_keyboard,
-    get_channel_detail_keyboard, get_click_payment_keyboard,
+    get_channel_detail_keyboard, get_payme_payment_keyboard,
 )
 from states import ConsultState
 from utils import notify_admins
 from services.crm import create_lead
-from services.click import generate_payment_url
+from services.payme import generate_payme_url
+from db import create_payme_order
 import app_state
 
 router = Router()
@@ -185,10 +186,12 @@ async def consult_answer_2(message: Message, state: FSMContext, texts):
 async def pay_channel(callback: CallbackQuery, texts):
     user = await get_user(callback.from_user.id)
     lang = user.get("language", "ru") if user else "ru"
-    amount = CHANNEL_SUBSCRIPTION["price"]
-    url = generate_payment_url(callback.from_user.id, "channel_sub", amount)
-    pay_text = texts.CLICK_PAY_INFO if hasattr(texts, "CLICK_PAY_INFO") else "💳 Нажмите кнопку ниже для оплаты через Click:"
-    await callback.message.edit_text(pay_text, reply_markup=get_click_payment_keyboard(url, "back_to_cats", lang))
+    amount_uzs = CHANNEL_SUBSCRIPTION["price"]
+    amount_tiyin = amount_uzs * 100
+    order_id = await create_payme_order(callback.from_user.id, "channel_sub", amount_tiyin)
+    url = generate_payme_url(order_id, amount_uzs, lang)
+    pay_text = "💳 Нажмите кнопку ниже для оплаты через Payme:" if lang == "ru" else "💳 Payme orqali to'lash uchun tugmani bosing:"
+    await callback.message.edit_text(pay_text, reply_markup=get_payme_payment_keyboard(url, "back_to_cats", lang))
     await callback.answer()
 
 
@@ -202,12 +205,13 @@ async def pay_course(callback: CallbackQuery, texts):
 
     user = await get_user(callback.from_user.id)
     lang = user.get("language", "ru") if user else "ru"
-    amount = course.get("price_uzs", course["price"])
-    url = generate_payment_url(callback.from_user.id, course_key, amount)
-    pay_text = texts.CLICK_PAY_INFO if hasattr(texts, "CLICK_PAY_INFO") else "💳 Нажмите кнопку ниже для оплаты через Click:"
-    await callback.message.edit_text(pay_text, reply_markup=get_click_payment_keyboard(url, "back_to_courses", lang))
+    amount_uzs = course.get("price_uzs", course["price"])
+    amount_tiyin = amount_uzs * 100
+    order_id = await create_payme_order(callback.from_user.id, course_key, amount_tiyin)
+    url = generate_payme_url(order_id, amount_uzs, lang)
+    pay_text = "💳 Нажмите кнопку ниже для оплаты через Payme:" if lang == "ru" else "💳 Payme orqali to'lash uchun tugmani bosing:"
+    await callback.message.edit_text(pay_text, reply_markup=get_payme_payment_keyboard(url, "back_to_courses", lang))
 
-    # CRM lead
     if user:
         await create_lead({
             "user_id": callback.from_user.id,
