@@ -27,8 +27,13 @@ def _sign(click_trans_id, merchant_trans_id, amount, action, sign_time, merchant
 
 
 def _parse_trans_id(merchant_trans_id: str):
-    """Parse 'user_id_product_key_timestamp' → (user_id, product_key)."""
-    parts = merchant_trans_id.split("_", 2)
+    """Parse 'user_id_product_key_timestamp' → (user_id, product_key).
+    product_key может содержать '_' (например channel_sub),
+    поэтому отрезаем timestamp справа, user_id слева.
+    """
+    # Убираем timestamp (последняя часть после последнего '_')
+    without_ts = merchant_trans_id.rsplit("_", 1)[0]  # "7586078580_channel_sub"
+    parts = without_ts.split("_", 1)                  # ["7586078580", "channel_sub"]
     if len(parts) < 2:
         return None, None
     try:
