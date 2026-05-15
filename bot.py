@@ -53,6 +53,9 @@ def build_web_app() -> web.Application:
     app = web.Application()
     app.router.add_post("/click/prepare", click_prepare_handler)
     app.router.add_post("/click/complete", click_complete_handler)
+    # GET нужен чтобы Click мог проверить URL при сохранении в кабинете
+    app.router.add_get("/click/prepare", health_handler)
+    app.router.add_get("/click/complete", health_handler)
     app.router.add_get("/health", health_handler)
     return app
 
