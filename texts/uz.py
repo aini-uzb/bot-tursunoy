@@ -71,7 +71,10 @@ CONSULT_Q1 = (
     "🎯 <b>Bepul konsultatsiya</b>\n\n"
     "Vaziyatingizni tahlil qilaman va yo'nalish tanlashga yordam beraman.\n\n"
     "2 ta qisqa savolga javob bering 👇\n\n"
-    "1️⃣ Hozir sizning <b>asosiy maqsadingiz</b> nima?"
+    "1️⃣ <b>Nimaga erishmoqchisiz?</b>\n"
+    "Hozir ta'lim yoki karyerangizda siz uchun eng muhim narsa nima — yozing.\n"
+    "<i>Masalan: «chet elda magistraturaga kirmoqchiman», "
+    "«kuchli esse yozishim kerak», «ilmiy maqola chop etmoqchiman»</i>"
 )
 
 CONSULT_Q2 = (
