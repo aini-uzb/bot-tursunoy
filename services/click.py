@@ -52,10 +52,9 @@ async def handle_prepare(data: dict) -> dict:
     expected = _sign(click_trans_id, merchant_trans_id, amount, 0, sign_time)
     logger.info(f"[Click] prepare sign: expected={expected} got={sign_string} match={expected==sign_string}")
     logger.info(f"[Click] prepare raw: trans={click_trans_id} svc={CLICK_SERVICE_ID} mtrans={merchant_trans_id} amount={amount} time={sign_time}")
-    # Временно пропускаем проверку подписи для диагностики
-    # if expected != sign_string:
-    #     logger.warning(f"[Click] prepare sign MISMATCH")
-    #     return {"error": -1, "error_note": "SIGN CHECK FAILED!"}
+    if expected != sign_string:
+        logger.warning("[Click] prepare sign MISMATCH")
+        return {"error": -1, "error_note": "SIGN CHECK FAILED!"}
 
     user_id, product_key = _parse_trans_id(merchant_trans_id)
     if not user_id:
@@ -87,10 +86,9 @@ async def handle_complete(data: dict) -> dict:
 
     expected = _sign(click_trans_id, merchant_trans_id, amount, 1, sign_time, merchant_prepare_id)
     logger.info(f"[Click] complete sign: expected={expected} got={sign_string} match={expected==sign_string}")
-    # Временно пропускаем проверку подписи для диагностики
-    # if expected != sign_string:
-    #     logger.warning(f"[Click] complete sign mismatch")
-    #     return {"error": -1, "error_note": "SIGN CHECK FAILED!"}
+    if expected != sign_string:
+        logger.warning("[Click] complete sign MISMATCH")
+        return {"error": -1, "error_note": "SIGN CHECK FAILED!"}
 
     if error < 0:
         logger.info(f"[Click] payment cancelled/failed: {merchant_trans_id}")

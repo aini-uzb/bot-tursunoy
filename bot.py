@@ -25,38 +25,24 @@ async def click_prepare_handler(request: web.Request) -> web.Response:
     try:
         data = dict(await request.post())
         logger.info(f"[Click] /prepare received: {data}")
-        click_trans_id = data.get("click_trans_id", "0")
-        merchant_trans_id = data.get("merchant_trans_id", "test")
-        # Hardcoded success — testing if Click reaches our server at all
-        return web.json_response({
-            "click_trans_id": int(click_trans_id) if str(click_trans_id).isdigit() else 0,
-            "merchant_trans_id": merchant_trans_id,
-            "merchant_prepare_id": 1,
-            "error": 0,
-            "error_note": "Success",
-        })
+        from services.click import handle_prepare
+        result = await handle_prepare(data)
+        return web.json_response(result)
     except Exception as e:
         logger.exception(f"[Click] /prepare error: {e}")
-        return web.json_response({"click_trans_id": 0, "merchant_trans_id": "error", "merchant_prepare_id": 1, "error": 0, "error_note": "Success"})
+        return web.json_response({"error": -9, "error_note": "Internal error"})
 
 
 async def click_complete_handler(request: web.Request) -> web.Response:
     try:
         data = dict(await request.post())
         logger.info(f"[Click] /complete received: {data}")
-        click_trans_id = data.get("click_trans_id", "0")
-        merchant_trans_id = data.get("merchant_trans_id", "test")
-        # Hardcoded success — testing if Click reaches our server at all
-        return web.json_response({
-            "click_trans_id": int(click_trans_id) if str(click_trans_id).isdigit() else 0,
-            "merchant_trans_id": merchant_trans_id,
-            "merchant_confirm_id": 1,
-            "error": 0,
-            "error_note": "Success",
-        })
+        from services.click import handle_complete
+        result = await handle_complete(data)
+        return web.json_response(result)
     except Exception as e:
         logger.exception(f"[Click] /complete error: {e}")
-        return web.json_response({"click_trans_id": 0, "merchant_trans_id": "error", "merchant_confirm_id": 1, "error": 0, "error_note": "Success"})
+        return web.json_response({"error": -9, "error_note": "Internal error"})
 
 
 async def payme_webhook_handler(request: web.Request) -> web.Response:
