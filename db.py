@@ -1,9 +1,12 @@
+import os
 import json
 import aiosqlite
 import logging
 from datetime import datetime
 
-DB_PATH = "users.db"
+# On Railway the filesystem is wiped on every redeploy. Set DB_PATH to a
+# mounted Volume path (e.g. /data/users.db) so data survives deploys.
+DB_PATH = os.getenv("DB_PATH", "users.db")
 logger = logging.getLogger(__name__)
 
 
