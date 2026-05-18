@@ -277,6 +277,18 @@ async def get_payme_transaction(transaction_id: str) -> dict | None:
             return dict(row) if row else None
 
 
+async def get_payme_active_transaction_for_order(order_id: int) -> dict | None:
+    """Pending (state=1) or completed (state=2) transaction for an order."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute(
+            "SELECT * FROM payme_transactions WHERE order_id = ? AND state IN (1, 2)",
+            (order_id,),
+        ) as cur:
+            row = await cur.fetchone()
+            return dict(row) if row else None
+
+
 async def complete_payme_transaction(transaction_id: str, perform_time: int):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(

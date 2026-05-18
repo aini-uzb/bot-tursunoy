@@ -95,7 +95,10 @@ async def _check_perform(params: dict) -> dict:
 
 
 async def _create(params: dict) -> dict:
-    from db import get_payme_order, save_payme_transaction, get_payme_transaction
+    from db import (
+        get_payme_order, save_payme_transaction, get_payme_transaction,
+        get_payme_active_transaction_for_order,
+    )
     transaction_id = params.get("id")
     account = params.get("account", {})
     order_id = account.get("order_id")
@@ -106,12 +109,6 @@ async def _create(params: dict) -> dict:
     except (TypeError, ValueError):
         return {"error": {"code": -31050, "message": {"ru": "Заказ не найден", "uz": "Buyurtma topilmadi", "en": "Order not found"}}}
 
-    order = await get_payme_order(order_id)
-    if not order:
-        return {"error": {"code": -31050, "message": {"ru": "Заказ не найден", "uz": "Buyurtma topilmadi", "en": "Order not found"}}}
-    if order["amount"] != int(amount):
-        return {"error": {"code": -31001, "message": {"ru": "Неверная сумма", "uz": "Noto'g'ri summa", "en": "Wrong amount"}}}
-
     existing = await get_payme_transaction(transaction_id)
     if existing:
         return {
@@ -119,6 +116,17 @@ async def _create(params: dict) -> dict:
             "transaction": transaction_id,
             "state": existing["state"],
         }
+
+    order = await get_payme_order(order_id)
+    if not order:
+        return {"error": {"code": -31050, "message": {"ru": "Заказ не найден", "uz": "Buyurtma topilmadi", "en": "Order not found"}}}
+    if order["amount"] != int(amount):
+        return {"error": {"code": -31001, "message": {"ru": "Неверная сумма", "uz": "Noto'g'ri summa", "en": "Wrong amount"}}}
+
+    # Order already has another active transaction → cannot create a second one
+    active = await get_payme_active_transaction_for_order(order_id)
+    if active:
+        return {"error": {"code": -31050, "message": {"ru": "Заказ уже обрабатывается", "uz": "Buyurtma allaqachon ishlanmoqda", "en": "Order already in progress"}}}
 
     now = int(time.time() * 1000)
     await save_payme_transaction(transaction_id, order_id, int(amount), now)
