@@ -167,10 +167,16 @@ async def _cancel(params: dict) -> dict:
     if not tx:
         return {"error": {"code": -31003, "message": {"ru": "Транзакция не найдена", "uz": "Tranzaksiya topilmadi", "en": "Transaction not found"}}}
 
-    if tx["state"] == COMPLETED:
-        return {"error": {"code": -31007, "message": {"ru": "Нельзя отменить", "uz": "Bekor qilib bo'lmaydi", "en": "Cannot cancel"}}}
+    # Already cancelled — idempotent, return existing cancel info
+    if tx["state"] in (CANCELLED, CANCELLED_AFTER_COMPLETE):
+        return {
+            "transaction": transaction_id,
+            "cancel_time": tx.get("cancel_time", 0),
+            "state": tx["state"],
+        }
 
     now = int(time.time() * 1000)
+    # Pending → -1; completed → -2 (cancel after complete / refund)
     state = CANCELLED if tx["state"] == PENDING else CANCELLED_AFTER_COMPLETE
     await cancel_payme_transaction(transaction_id, state, reason, now)
     return {"transaction": transaction_id, "cancel_time": now, "state": state}
