@@ -73,7 +73,7 @@ def _error(code: int, message: str, req_id=1) -> web.Response:
 
 
 async def _check_perform(params: dict) -> dict:
-    from db import get_payme_order
+    from db import get_payme_order, get_payme_active_transaction_for_order
     account = params.get("account", {})
     order_id = account.get("order_id")
     amount = params.get("amount")
@@ -90,6 +90,11 @@ async def _check_perform(params: dict) -> dict:
         return {"error": {"code": -31050, "message": {"ru": "Уже оплачено", "uz": "Allaqachon to'langan", "en": "Already paid"}}}
     if order["amount"] != int(amount):
         return {"error": {"code": -31001, "message": {"ru": "Неверная сумма", "uz": "Noto'g'ri summa", "en": "Wrong amount"}}}
+
+    # Order already has an active transaction → report it here (consistent with CreateTransaction)
+    active = await get_payme_active_transaction_for_order(order_id)
+    if active:
+        return {"error": {"code": -31050, "message": {"ru": "Заказ уже обрабатывается", "uz": "Buyurtma allaqachon ishlanmoqda", "en": "Order already in progress"}}}
 
     return {"allow": True}
 
