@@ -58,6 +58,11 @@ async def click_health_handler(_: web.Request) -> web.Response:
     return web.json_response({"error": 0, "error_note": "Success"})
 
 
+async def click_debug_handler(_: web.Request) -> web.Response:
+    from services.click import last_sign_debug
+    return web.json_response(last_sign_debug or {"info": "no Click request received yet"})
+
+
 def build_web_app() -> web.Application:
     app = web.Application()
     app.router.add_post("/click/prepare", click_prepare_handler)
@@ -66,6 +71,7 @@ def build_web_app() -> web.Application:
     app.router.add_get("/click/prepare", click_health_handler)
     app.router.add_get("/click/complete", click_health_handler)
     app.router.add_post("/payme", payme_webhook_handler)
+    app.router.add_get("/click/debug", click_debug_handler)
     app.router.add_get("/health", health_handler)
     return app
 

@@ -6,6 +6,10 @@ from config import CLICK_SERVICE_ID, CLICK_MERCHANT_ID, CLICK_SECRET_KEY
 
 logger = logging.getLogger(__name__)
 
+# Последний разбор подписи Click — читается через GET /click/debug
+# (секретный ключ сюда НЕ кладём). Нужно для отладки без логов Railway.
+last_sign_debug: dict = {}
+
 
 def generate_payment_url(user_id: int, product_key: str, amount_uzs: int) -> str:
     merchant_trans_id = f"{user_id}_{product_key}_{int(time.time())}"
@@ -52,6 +56,18 @@ async def handle_prepare(data: dict) -> dict:
     expected = _sign(click_trans_id, merchant_trans_id, amount, 0, sign_time)
     logger.info(f"[Click] prepare sign: expected={expected} got={sign_string} match={expected==sign_string}")
     logger.info(f"[Click] prepare raw: trans={click_trans_id} svc={CLICK_SERVICE_ID} mtrans={merchant_trans_id} amount={amount} time={sign_time}")
+    last_sign_debug.clear()
+    last_sign_debug.update({
+        "stage": "prepare",
+        "expected": expected,
+        "got": sign_string,
+        "match": expected == sign_string,
+        "click_trans_id": click_trans_id,
+        "service_id": CLICK_SERVICE_ID,
+        "merchant_trans_id": merchant_trans_id,
+        "amount": amount,
+        "sign_time": sign_time,
+    })
     if expected != sign_string:
         logger.warning("[Click] prepare sign MISMATCH")
         return {"error": -1, "error_note": "SIGN CHECK FAILED!"}
@@ -86,6 +102,19 @@ async def handle_complete(data: dict) -> dict:
 
     expected = _sign(click_trans_id, merchant_trans_id, amount, 1, sign_time, merchant_prepare_id)
     logger.info(f"[Click] complete sign: expected={expected} got={sign_string} match={expected==sign_string}")
+    last_sign_debug.clear()
+    last_sign_debug.update({
+        "stage": "complete",
+        "expected": expected,
+        "got": sign_string,
+        "match": expected == sign_string,
+        "click_trans_id": click_trans_id,
+        "service_id": CLICK_SERVICE_ID,
+        "merchant_trans_id": merchant_trans_id,
+        "merchant_prepare_id": merchant_prepare_id,
+        "amount": amount,
+        "sign_time": sign_time,
+    })
     if expected != sign_string:
         logger.warning("[Click] complete sign MISMATCH")
         return {"error": -1, "error_note": "SIGN CHECK FAILED!"}
