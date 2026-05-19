@@ -13,6 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 def _has_broadcast_hashtag(text: str) -> bool:
+    """True if the post contains AT LEAST ONE broadcast tag.
+
+    This is a yes/no check, not a counter — a post with several tags
+    (e.g. #поступление #admission #qabul) still triggers exactly one
+    forward per user below. No duplicates from multiple tags.
+    """
     if not text:
         return False
     text_lower = text.lower()

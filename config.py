@@ -29,9 +29,16 @@ AMOCRM_REDIRECT_URI: str = os.getenv("AMOCRM_REDIRECT_URI", "")
 AMOCRM_ACCESS_TOKEN: str = os.getenv("AMOCRM_ACCESS_TOKEN", "")
 AMOCRM_REFRESH_TOKEN: str = os.getenv("AMOCRM_REFRESH_TOKEN", "")
 
-# Хештеги для автобродкаста
+# Хештеги для автобродкаста — 3 смысла на 3 языках (RU/EN/UZ), все запускают
+# одну и ту же рассылку. Пост с любым из этих тегов пересылается каждому
+# пользователю ровно один раз, даже если в посте несколько тегов сразу.
+_DEFAULT_HASHTAGS = (
+    "#поступление,#учёба,#студент,"
+    "#admission,#study,#student,"
+    "#qabul,#oqish,#talaba"
+)
 BROADCAST_HASHTAGS: list[str] = [
-    t.strip() for t in os.getenv("BROADCAST_HASHTAGS", "#поступление,#учёба,#студент").split(",")
+    t.strip() for t in os.getenv("BROADCAST_HASHTAGS", _DEFAULT_HASHTAGS).split(",")
     if t.strip()
 ]
 
