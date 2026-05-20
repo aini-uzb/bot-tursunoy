@@ -66,9 +66,9 @@ CHANNEL_SUBSCRIPTION: dict = {
         "📅 Kirish: 30 kun\n\n"
         "To'lash uchun tugmani bosing 👇"
     ),
-    "price": 3000,
-    "price_display_ru": "3,000 сум/мес",
-    "price_display_uz": "3,000 so'm/oy",
+    "price": 200000,
+    "price_display_ru": "200,000 сум/мес",
+    "price_display_uz": "200,000 so'm/oy",
     "days": 30,
     "channel_id": os.getenv("CHANNEL_SUBSCRIPTION_ID", ""),
 }
@@ -76,8 +76,8 @@ CHANNEL_SUBSCRIPTION: dict = {
 # 5 платных курсов
 COURSES: dict = {
     "ivy_masters": {
-        "name_ru": "🎓 Магистратура Ivy League",
-        "name_uz": "🎓 Ivy League magistratura",
+        "name_ru": "🎓 Master's Bootcamp T&T Progress",
+        "name_uz": "🎓 Master's Bootcamp T&T Progress",
         "brief_ru": "Поступление в топ университеты мира — $500 · 90 дней",
         "brief_uz": "Dunyoning top universitetlariga kirish — $500 · 90 kun",
         "desc_ru": (
@@ -106,8 +106,8 @@ COURSES: dict = {
         "channel_id": os.getenv("CHANNEL_IVY_MASTERS", ""),
     },
     "motivation_letter": {
-        "name_ru": "✍️ Мотивационное письмо (22 нед.)",
-        "name_uz": "✍️ Motivatsion xat (22 hafta)",
+        "name_ru": "✍️ Essays Bootcamp T&T Progress",
+        "name_uz": "✍️ Essays Bootcamp T&T Progress",
         "brief_ru": "Essay без ChatGPT, авторский подход — $500 · 90 дней",
         "brief_uz": "ChatGPTsiz essay, muallif yondashuvi — $500 · 90 kun",
         "desc_ru": (
@@ -136,8 +136,8 @@ COURSES: dict = {
         "channel_id": os.getenv("CHANNEL_MOTIVATION", ""),
     },
     "activities_bootcamp": {
-        "name_ru": "🚀 Activities Bootcamp",
-        "name_uz": "🚀 Activities Bootcamp",
+        "name_ru": "🚀 Activities Bootcamp 7.0",
+        "name_uz": "🚀 Activities Bootcamp 7.0",
         "brief_ru": "Интенсивный буткемп для поступления в IVY — $200 · 30 дней",
         "brief_uz": "IVY ga kirish uchun intensiv bootcamp — $200 · 30 kun",
         "desc_ru": (
@@ -166,8 +166,8 @@ COURSES: dict = {
         "channel_id": os.getenv("CHANNEL_BOOTCAMP", ""),
     },
     "ivy_bachelors": {
-        "name_ru": "🏛 Бакалавр IVY",
-        "name_uz": "🏛 IVY bakalavr",
+        "name_ru": "🏛 Bakalavrga top 20 ga kirish T&T Progress",
+        "name_uz": "🏛 Bakalavrga top 20 ga kirish T&T Progress",
         "brief_ru": "Полное сопровождение в бакалавриат IVY — $2000 · 90 дней",
         "brief_uz": "IVY bakalavriatiga to'liq hamrohlik — $2000 · 90 kun",
         "desc_ru": (
@@ -196,8 +196,8 @@ COURSES: dict = {
         "channel_id": os.getenv("CHANNEL_IVY_BACHELORS", ""),
     },
     "research_paper": {
-        "name_ru": "📄 Научная статья",
-        "name_uz": "📄 Ilmiy maqola",
+        "name_ru": "📄 Research Bootcamp T&T Progress",
+        "name_uz": "📄 Research Bootcamp T&T Progress",
         "brief_ru": "Публикация в Scopus/WoS, структура и методология — $400 · 90 дней",
         "brief_uz": "Scopus/WoS da nashr, tuzilish va metodologiya — $400 · 90 kun",
         "desc_ru": (
