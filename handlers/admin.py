@@ -1,11 +1,12 @@
 import logging
+from datetime import datetime, timedelta
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
-from aiogram.filters import StateFilter
+from aiogram.filters import StateFilter, Command
 
 from config import ADMIN_IDS, COURSES, CHANNEL_SUBSCRIPTION
-from db import get_pending_payment, update_payment, get_admin_messages, get_user
+from db import get_pending_payment, update_payment, get_admin_messages, get_user, get_stats
 from keyboards.products import get_admin_payment_keyboard
 from states import AdminState
 from services.subscription import grant_access
@@ -19,6 +20,36 @@ logger = logging.getLogger(__name__)
 
 def _is_admin(user_id: int) -> bool:
     return user_id in ADMIN_IDS
+
+
+@router.message(Command("stats"))
+async def stats_command(message: Message):
+    if not _is_admin(message.from_user.id):
+        return
+
+    now = datetime.now()
+    all_time = await get_stats()
+    last_month = await get_stats(since=now - timedelta(days=30))
+    last_year = await get_stats(since=now - timedelta(days=365))
+
+    def fmt(s: dict) -> str:
+        return (
+            f"👥 Начали бот: <b>{s['starts']}</b>\n"
+            f"💳 Перешли к оплате: <b>{s['payment_views']}</b>\n"
+            f"✅ Оплатили: <b>{s['paid']}</b>"
+            + (f" (вручную: {s['manual_paid']}, Payme: {s['payme_paid']})" if s['paid'] else "")
+        )
+
+    text = (
+        "📊 <b>Статистика бота</b>\n\n"
+        "📅 <b>За всё время:</b>\n"
+        f"{fmt(all_time)}\n\n"
+        "📅 <b>За последние 30 дней:</b>\n"
+        f"{fmt(last_month)}\n\n"
+        "📅 <b>За последний год:</b>\n"
+        f"{fmt(last_year)}"
+    )
+    await message.answer(text)
 
 
 async def _edit_all_admin_messages(payment_id: int, new_caption: str):

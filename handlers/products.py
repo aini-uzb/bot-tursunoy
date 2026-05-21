@@ -15,7 +15,7 @@ from utils import notify_admins
 from services.crm import create_lead
 from services.payme import generate_payme_url
 from services.click import generate_payment_url as generate_click_url
-from db import create_payme_order
+from db import create_payme_order, log_event
 import app_state
 
 router = Router()
@@ -193,6 +193,7 @@ async def pay_channel(callback: CallbackQuery, texts):
     click_url = generate_click_url(callback.from_user.id, "channel_sub", amount_uzs)
     payme_url = generate_payme_url(order_id, amount_uzs, lang)
     pay_text = "💳 Выберите способ оплаты:" if lang == "ru" else "💳 To'lov usulini tanlang:"
+    await log_event(callback.from_user.id, "payment_view", "channel_sub")
     await callback.message.edit_text(pay_text, reply_markup=get_payment_keyboard(click_url, payme_url, "back_to_cats", lang))
     await callback.answer()
 
@@ -213,6 +214,7 @@ async def pay_course(callback: CallbackQuery, texts):
     click_url = generate_click_url(callback.from_user.id, course_key, amount_uzs)
     payme_url = generate_payme_url(order_id, amount_uzs, lang)
     pay_text = "💳 Выберите способ оплаты:" if lang == "ru" else "💳 To'lov usulini tanlang:"
+    await log_event(callback.from_user.id, "payment_view", course_key)
     await callback.message.edit_text(pay_text, reply_markup=get_payment_keyboard(click_url, payme_url, "back_to_courses", lang))
 
     if user:

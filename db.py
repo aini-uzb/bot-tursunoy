@@ -78,6 +78,15 @@ async def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                event_type TEXT NOT NULL,
+                product_key TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
         await db.commit()
 
 
@@ -319,3 +328,63 @@ async def get_payme_transactions_range(from_ms: int, to_ms: int) -> list[dict]:
         ) as cur:
             rows = await cur.fetchall()
             return [dict(r) for r in rows]
+
+
+# ─── Events & Stats ──────────────────────────────────────────────────────────
+
+async def log_event(user_id: int, event_type: str, product_key: str | None = None):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "INSERT INTO events (user_id, event_type, product_key) VALUES (?, ?, ?)",
+            (user_id, event_type, product_key),
+        )
+        await db.commit()
+
+
+async def get_stats(since: datetime | None = None) -> dict:
+    """Return bot stats counts, optionally filtered to events after `since`."""
+    async with aiosqlite.connect(DB_PATH) as db:
+        if since:
+            since_str = since.isoformat()
+            async with db.execute(
+                "SELECT COUNT(*) FROM users WHERE created_at >= ?", (since_str,)
+            ) as cur:
+                starts = (await cur.fetchone())[0]
+            async with db.execute(
+                "SELECT COUNT(*) FROM events WHERE event_type = 'payment_view' AND created_at >= ?",
+                (since_str,),
+            ) as cur:
+                payment_views = (await cur.fetchone())[0]
+            async with db.execute(
+                "SELECT COUNT(*) FROM pending_payments WHERE status = 'approved' AND created_at >= ?",
+                (since_str,),
+            ) as cur:
+                manual_paid = (await cur.fetchone())[0]
+            async with db.execute(
+                "SELECT COUNT(*) FROM payme_orders WHERE paid = 1 AND created_at >= ?",
+                (since_str,),
+            ) as cur:
+                payme_paid = (await cur.fetchone())[0]
+        else:
+            async with db.execute("SELECT COUNT(*) FROM users") as cur:
+                starts = (await cur.fetchone())[0]
+            async with db.execute(
+                "SELECT COUNT(*) FROM events WHERE event_type = 'payment_view'"
+            ) as cur:
+                payment_views = (await cur.fetchone())[0]
+            async with db.execute(
+                "SELECT COUNT(*) FROM pending_payments WHERE status = 'approved'"
+            ) as cur:
+                manual_paid = (await cur.fetchone())[0]
+            async with db.execute(
+                "SELECT COUNT(*) FROM payme_orders WHERE paid = 1"
+            ) as cur:
+                payme_paid = (await cur.fetchone())[0]
+
+        return {
+            "starts": starts,
+            "payment_views": payment_views,
+            "paid": manual_paid + payme_paid,
+            "manual_paid": manual_paid,
+            "payme_paid": payme_paid,
+        }
