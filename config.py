@@ -66,7 +66,7 @@ CHANNEL_SUBSCRIPTION: dict = {
         "📅 Kirish: 30 kun\n\n"
         "To'lash uchun tugmani bosing 👇"
     ),
-    "price": 3000,  # TEMP: вернуть 200000 после теста
+    "price": 200000,
     "price_display_ru": "200,000 сум/мес",
     "price_display_uz": "200,000 so'm/oy",
     "days": 30,
