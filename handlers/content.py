@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 
+from config import VIDEO_FILE_ID
 from db import update_user
 from keyboards.video import get_video_keyboard
 from keyboards.products import get_category_keyboard
@@ -14,12 +15,19 @@ logger = logging.getLogger(__name__)
 
 
 async def send_welcome_and_video(message: Message, texts):
-    """Steps 4+5: welcome text → 2s pause → video with warmup timer."""
+    """Steps 4+5: welcome text → video (or placeholder) with warmup timer."""
     user_id = message.from_user.id
-    sent_video = await message.answer(
-        texts.WELCOME + "\n\n" + texts.VIDEO_PLACEHOLDER,
-        reply_markup=get_video_keyboard(texts.BTN_WATCHED),
-    )
+    if VIDEO_FILE_ID:
+        sent_video = await message.answer_video(
+            video=VIDEO_FILE_ID,
+            caption=texts.VIDEO_MESSAGE,
+            reply_markup=get_video_keyboard(texts.BTN_WATCHED),
+        )
+    else:
+        sent_video = await message.answer(
+            texts.WELCOME + "\n\n" + texts.VIDEO_PLACEHOLDER,
+            reply_markup=get_video_keyboard(texts.BTN_WATCHED),
+        )
     track_message(user_id, sent_video.message_id)
 
     now = datetime.now()

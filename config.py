@@ -5,6 +5,7 @@ load_dotenv()
 
 BOT_TOKEN: str = os.getenv("BOT_TOKEN", "")
 FREE_CHANNEL_ID: str = os.getenv("FREE_CHANNEL_ID", "")
+VIDEO_FILE_ID: str = os.getenv("VIDEO_FILE_ID", "")
 
 # Click
 CLICK_SERVICE_ID: str = os.getenv("CLICK_SERVICE_ID", "")

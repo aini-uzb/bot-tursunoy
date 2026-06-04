@@ -22,6 +22,26 @@ def _is_admin(user_id: int) -> bool:
     return user_id in ADMIN_IDS
 
 
+@router.message(Command("setvideo"))
+async def setvideo_command(message: Message):
+    """Reply to a video message with /setvideo to get its file_id."""
+    if not _is_admin(message.from_user.id):
+        return
+    reply = message.reply_to_message
+    if not reply or not reply.video:
+        await message.answer(
+            "Ответьте командой /setvideo на сообщение с видео.\n\n"
+            "Перешлите видео в этот чат → ответьте на него /setvideo"
+        )
+        return
+    file_id = reply.video.file_id
+    await message.answer(
+        f"✅ <b>file_id видео:</b>\n<code>{file_id}</code>\n\n"
+        f"Скопируй и поставь на Railway как переменную:\n"
+        f"<code>VIDEO_FILE_ID={file_id}</code>"
+    )
+
+
 @router.message(Command("stats"))
 async def stats_command(message: Message):
     if not _is_admin(message.from_user.id):
