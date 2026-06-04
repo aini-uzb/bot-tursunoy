@@ -30,20 +30,24 @@ NOT_SUBSCRIBED = "❌ Siz hali obuna bo'lmagansiz. Kanalga obuna bo'ling va tugm
 # ═══════════════════════════════════════
 
 WELCOME = (
-    "👋 Tanishganimdan xursandman!\n\n"
-    "Mening ismim Tursunoy, men odamlarga hayotda va daromadda "
-    "yangi bosqichga chiqishga yordam beraman.\n\n"
-    "📌 So'nggi bir yil ichida 200 dan ortiq o'quvchilarim haqiqiy "
-    "natijalarga erishdi — daromadlarini oshirdi, yo'nalishlarini topdi "
-    "va harakat qila boshladi.\n\n"
-    "Siz uchun qisqa video tayyorladim — uni ko'ring, "
-    "va men sizga qanday foydali bo'lishimni tushunasiz ⬇️"
+    "👋 Salom! Mening ismim Tursunoy Usmonova.\n\n"
+    "🎓 Kolumbiya universiteti sertifikati\n"
+    "🏆 Global UCRAO 2017 g'olibi\n"
+    "💡 «El-yurt umid» jamg'armasi stipendiati\n\n"
+    "3 yil ichida mening talabalarim AQSHning eng yaxshi universitetlariga "
+    "kirdi va <b>$400,000+</b> stipendiya yutib oldi.\n\n"
+    "Men siz uchun <b>bepul video</b> tayyorladim, unda quyidagilarni aytaman:\n\n"
+    "✅ Dunyo top-universitetiga qanday kirish mumkin — hatto tayyor emasligingizni o'ylasangiz ham\n"
+    "✅ Imkoniyatlaringizni yo'q qiladigan 3 xato (va ulardan qanday qochish)\n"
+    "✅ Hoziroq nidan boshlash kerak — aniq reja\n\n"
+    "👇 Ko'ring — bu bepul:"
 )
 
 VIDEO_MESSAGE = (
-    "🎬 Siz uchun maxsus yozgan videom.\n\n"
-    "Oxirigacha ko'ring — u yerda eng muhim narsa.\n\n"
-    "⏱ Davomiyligi: ~5 daqiqa"
+    "🎬 <b>Tursunoydan bepul video</b>\n\n"
+    "Oxirigacha ko'ring — finalda hammasini o'zgartiradigan "
+    "eng muhim maslahat bor.\n\n"
+    "Ko'rib bo'lgach pastdagi tugmani bosing 👇"
 )
 
 VIDEO_PLACEHOLDER = "🎬 [Video shu yerda bo'ladi — faylni yuklang]\n\nKo'rib chiqing va pastdagi tugmani bosing 👇"

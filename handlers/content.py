@@ -18,6 +18,8 @@ async def send_welcome_and_video(message: Message, texts):
     """Steps 4+5: welcome text → video (or placeholder) with warmup timer."""
     user_id = message.from_user.id
     if VIDEO_FILE_ID:
+        sent_welcome = await message.answer(texts.WELCOME)
+        track_message(user_id, sent_welcome.message_id)
         sent_video = await message.answer_video(
             video=VIDEO_FILE_ID,
             caption=texts.VIDEO_MESSAGE,
