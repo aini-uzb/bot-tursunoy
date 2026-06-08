@@ -44,7 +44,7 @@ WELCOME = (
 )
 
 VIDEO_MESSAGE = (
-    "🎬 <b>Tursunoydan bepul video</b>\n\n"
+    "🎬 <b>$100,000 Grant — O'zbekistondan TOP universitetga kirish sirlari</b>\n\n"
     "Oxirigacha ko'ring — finalda hammasini o'zgartiradigan "
     "eng muhim maslahat bor.\n\n"
     "Ko'rib bo'lgach pastdagi tugmani bosing 👇"
